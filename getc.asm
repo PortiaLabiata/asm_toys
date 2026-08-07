@@ -17,7 +17,7 @@ my_getc:
     cmp eax, 0x0
     jz my_getc
 
-    mov al, [rb]
+    mov al, [_getc_buf]
     ret
 
 section ".data" writable
