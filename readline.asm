@@ -31,8 +31,6 @@ my_readline:
     pop ecx
     pop ebx
 
-    mov [ebx], eax
-
     ; Check if we hit the last char
     cmp eax, 0xa
     je .exit
@@ -41,11 +39,12 @@ my_readline:
     cmp ebx, ecx
     je .exit
 
+    mov [ebx], eax
     inc ebx
     inc edx
 
     jmp .loop
 .exit:
-    mov [ebx], 0x00
+    mov [ebx], byte 0x00
     mov eax, edx
     ret

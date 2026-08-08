@@ -18,7 +18,9 @@ _start:
     call strlen
 
     ; Print greeting message
+    push eax
     print "Hello, "
+    pop eax
     mov edx, eax
 
     ; Print person's name
