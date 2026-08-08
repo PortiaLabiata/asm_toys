@@ -15,6 +15,23 @@ macro read_line bufname*, bufsize*
     call readline
 }
 
+macro open filename*
+{
+    local label
+    local path
+    jmp label
+    path db filename,0x0
+    label:
+
+    mov eax, 5
+    mov ebx, path
+    mov ecx, 0 
+    mov edx, 2
+    int 0x80
+    debug_print "FD=", eax
+    mov [db_fd], eax
+}
+
 struc db_entry
 {
     .name   rb name_max_size
@@ -22,6 +39,10 @@ struc db_entry
 }
 
 _start:
+    open "./database.db"
+
+    cmp [db_fd], 0x0
+    jl could_not_open
     println "Type commands after prompt"
 _loop:
     print prompt, prompt_size
@@ -42,6 +63,10 @@ _loop:
 
     jmp invalid_func
 
+could_not_open:
+    println "Could not open file!"
+    exit 1
+
 help_func:
     print help_string, help_string_len 
     jmp _loop
@@ -53,8 +78,8 @@ exit_func:
 virtual at employees
         employee_name rb name_max_size
         employee_age rb age_max_size
-        age_offset = employee_age - employee_name
         size = $ - employee_name
+        age_offset = employee_age - employee_name
 end virtual
 
 adde_func:
@@ -108,9 +133,10 @@ get_entry:
     ret
 
 section ".bss" writable
-    command_buffer rb command_bufsize
-    employees rb db_max_size * db_entry_size
-    employee_counter dd 0
+    command_buffer      rb command_bufsize
+    employees           rb db_max_size * db_entry_size
+    employee_counter    dd 0
+    db_fd               dd 0
 
 section ".rodata"
     prompt db "> "
