@@ -5,6 +5,7 @@ extrn my_strcmp
 
 macro print data*, size 
 {
+    pusha
     ; Define local string constant,
     ; if we provided quoted string as
     ; an argument. We define it right 
@@ -19,15 +20,23 @@ macro print data*, size
         label:
     end if
 
-    ; If we provided quoted string,
-    ; load local constant's address, else
-    ; load provided address
-    if ~ data eqtype ""
-        mov ecx, data
-    else
-        mov ecx, msg
+    if data eqtype ""
         mov eax, msg
         call strlen
+        mov ecx, msg
+        mov edx, eax
+    else if size eqtype 1
+        mov ecx, data
+        mov edx, size
+    else
+        if ~ data eq eax
+            mov eax, data
+        end if
+
+        mov ecx, data
+        push ecx
+        call strlen
+        pop ecx
         mov edx, eax
     end if
 
@@ -35,17 +44,12 @@ macro print data*, size
         err "Print macro takes either quoted string, or buffer size"
     end if
 
-    ; If we did not provide size, then we
-    ; probably loaded it externally from strlen
-    if ~ size eq
-        mov edx, size
-    end if
-
     ; Set syscall number and fd
     mov eax, 4
     mov ebx, 1
 
     int 0x80
+    popa
 }
 
 macro exit code* 

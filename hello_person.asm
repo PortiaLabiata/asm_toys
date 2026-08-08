@@ -19,6 +19,7 @@ _start:
 
     ; Print greeting message
     debug_print "EAX=", eax
+    debug_print "&buffer=", buffer
     push eax
     print "Hello, "
     pop eax
