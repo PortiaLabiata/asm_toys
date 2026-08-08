@@ -14,20 +14,17 @@ _start:
     mov ebx, bufsize
     call readline
 
-    ; We need to backup eax to not calculate
-    ; line's length all over again
-    push eax
-    debug_print "EAX: ", eax 
+    mov eax, buffer
+    call strlen
 
     ; Print greeting message
     print "Hello, "
-
-    pop eax
     mov edx, eax
 
     ; Print person's name
     print buffer
     print "!"
+    print line_feed, 1
     exit 0
 
 section ".data" writable

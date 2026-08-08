@@ -60,6 +60,7 @@ macro debug_print string*, register*
         err "debug_print: first arg must be a string literal"
     end if
 
+    pusha
     mov eax, register
     call itoa
 
@@ -75,6 +76,7 @@ macro debug_print string*, register*
 
     print eax
     print line_feed, 1
+    popa
 }
 
 section ".rodata"

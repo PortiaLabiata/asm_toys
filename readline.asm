@@ -13,11 +13,12 @@ extrn 'my_getc' as getc
 ; @parm ebx - buffer size
 ; @returns - number of read bytes
 my_readline:
-    ; Address of the last cell of buffer 
+    ; Address of the last cell of buffer (- terminator)
     ; is now stored in ecx and current cell address
     ; is in ebx
     mov ecx, eax
     add ecx, ebx
+    dec ecx
     mov ebx, eax
     mov edx, 0
 .loop:
@@ -31,20 +32,20 @@ my_readline:
     pop ebx
 
     mov [ebx], eax
-    inc ebx
-    inc edx
 
     ; Check if we hit the last char
     cmp eax, 0xa
-    je .trim
+    je .exit
 
     ; Check if we hit the last cell
     cmp ebx, ecx
     je .exit
 
+    inc ebx
+    inc edx
+
     jmp .loop
-.trim:
-    dec edx
 .exit:
+    mov [ebx], 0x00
     mov eax, edx
     ret
