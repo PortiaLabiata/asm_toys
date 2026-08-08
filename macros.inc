@@ -1,6 +1,7 @@
 extrn 'my_readline' as readline 
 extrn 'my_strlen' as strlen
 extrn 'my_itoa' as itoa
+extrn my_strcmp
 
 macro print data*, size 
 {
@@ -93,6 +94,14 @@ macro debug_print string*, register*
 
     println eax
     popa
+}
+
+macro strcmp s1*, s2*
+{
+    mov eax, s1
+    mov ebx, s2
+    call my_strcmp
+    cmp eax, 0
 }
 
 section ".rodata"

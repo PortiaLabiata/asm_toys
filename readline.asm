@@ -8,7 +8,9 @@ extrn 'my_getc' as getc
 
 ; readline - reads one line into specified buffer.
 ; If line doesn't fit in buffer, it will be truncated
-; and function will return early.
+; and function will return early. This is a naive implementation,
+; that calls sys_read for every character, which is
+; suboptimal.
 ; @parm eax - buffer address
 ; @parm ebx - buffer size
 ; @returns - number of read bytes
