@@ -71,7 +71,6 @@ _start:
 
     ; Print person's name
     print buffer
-    int 0x80
 
     ; Exit
     mov eax, 1
