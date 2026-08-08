@@ -54,10 +54,27 @@ macro exit code*
     int 0x80
 }
 
+; That is suboptimal, because it uses two syscalls,
+; but will do
+macro println data*, size 
+{
+    if size eq
+        print data
+        print line_feed, 1
+    else
+        print data, size
+        print line_feed, 1
+    end if
+}
+
 macro debug_print string*, register*
 {
     if ~ string eqtype ""
         err "debug_print: first arg must be a string literal"
+    end if
+
+    if ~ (register eqtype eax | register eqtype 0)
+        err "debug_print: second arg must be register or number"
     end if
 
     pusha
@@ -74,8 +91,7 @@ macro debug_print string*, register*
     mov edx, eax
     pop eax
 
-    print eax
-    print line_feed, 1
+    println eax
     popa
 }
 

@@ -45,4 +45,4 @@ my_itoa:
 
 section ".data" writable
     _itoa_buffer rb 16
-    _itoa_buffer_size = $ - _itoa_buffer
+    _itoa_buffer_size = ($ - _itoa_buffer) - 1

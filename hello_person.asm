@@ -18,6 +18,7 @@ _start:
     call strlen
 
     ; Print greeting message
+    debug_print "EAX=", eax
     push eax
     print "Hello, "
     pop eax
