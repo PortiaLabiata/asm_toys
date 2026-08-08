@@ -19,6 +19,7 @@ my_readline:
     mov ecx, eax
     add ecx, ebx
     mov ebx, eax
+    mov edx, 0
 .loop:
     ; Character code will be in eax
     push ebx
@@ -30,18 +31,20 @@ my_readline:
     pop ebx
 
     mov [ebx], eax
-    add ebx, 1
+    inc ebx
+    inc edx
 
     ; Check if we hit the last char
     cmp eax, 0xa
-    je .exit
+    je .trim
 
     ; Check if we hit the last cell
     cmp ebx, ecx
     je .exit
 
     jmp .loop
+.trim:
+    dec edx
 .exit:
-    mov eax, ecx
-    sub eax, ebx
+    mov eax, edx
     ret

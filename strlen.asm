@@ -15,4 +15,5 @@ my_strlen:
     cmp bl, 0x00
     jnz .loop 
     sub eax, ecx
+    dec eax
     ret
