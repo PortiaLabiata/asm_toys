@@ -1,6 +1,6 @@
 ; Readline function
 
-format ELF64
+format ELF
 section ".text" executable
 public my_readline
 
@@ -21,13 +21,13 @@ my_readline:
     mov ebx, eax
 .loop:
     ; Character code will be in eax
-    push rbx
-    push rcx
+    push ebx
+    push ecx
 
     call getc
 
-    pop rcx
-    pop rbx
+    pop ecx
+    pop ebx
 
     mov [ebx], eax
     add ebx, 1

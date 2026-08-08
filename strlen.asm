@@ -1,6 +1,6 @@
 ; Strlen function implementation
 
-format ELF64
+format ELF
 section ".text" executable
 public my_strlen
 
