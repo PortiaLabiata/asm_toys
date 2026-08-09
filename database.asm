@@ -2,7 +2,16 @@
 
 format ELF
 section ".text" executable
+
+; Declare all functions as public for ease
+; of debugging
 public _start
+public help_func
+public adde_func 
+public list_func
+public save_func
+public load_func
+public exit_func
 
 include "macros.inc"
 
@@ -25,11 +34,40 @@ macro open filename*
 
     mov eax, 5
     mov ebx, path
-    mov ecx, 0 
-    mov edx, 2
+    mov ecx, 2
+    mov edx, 0
     int 0x80
-    debug_print "FD=", eax
     mov [db_fd], eax
+}
+
+macro write fd*, buf*, size
+{
+    mov eax, 4
+    mov ebx, fd
+    mov ecx, buf
+
+    if ~ size eq
+        mov edx, size
+    end if
+    int 0x80
+}
+
+macro seek fd*, offset*
+{
+    mov eax, 19
+    mov ebx, fd
+    mov ecx, offset
+    mov edx, 0
+    int 0x80
+}
+
+macro read fd*, buf*, size*
+{
+    mov eax, 3
+    mov ebx, fd
+    mov ecx, buf
+    mov edx, size
+    int 0x80
 }
 
 struc db_entry
@@ -61,6 +99,12 @@ _loop:
     strcmp command_buffer, list_name
     je list_func
 
+    strcmp command_buffer, save_name
+    je save_func
+
+    strcmp command_buffer, load_name
+    je load_func
+
     jmp invalid_func
 
 could_not_open:
@@ -76,10 +120,10 @@ exit_func:
     exit 0
 
 virtual at employees
-        employee_name rb name_max_size
-        employee_age rb age_max_size
-        size = $ - employee_name
-        age_offset = employee_age - employee_name
+    employee_name rb name_max_size
+    employee_age rb age_max_size
+    size = $ - employee_name
+    age_offset = employee_age - employee_name
 end virtual
 
 adde_func:
@@ -119,18 +163,32 @@ list_loop:
 
     jmp _loop
 
+save_func:
+    seek [db_fd], 0
+    mov edx, [employee_counter]
+    imul edx, size
+    write [db_fd], employees
+    debug_print "RET=", eax
+
+    cmp eax, 0x0
+    jg _loop
+
+    println "Error writing to file!"
+    jmp _loop
+
+load_func:
+    seek [db_fd], 0
+    read [db_fd], employees, db_max_size * db_entry_size
+    mov ebx, db_entry_size
+    xor edx, edx
+    div ebx
+    mov [employee_counter], eax
+    debug_print "CNT=", eax
+    jmp _loop
+
 invalid_func:
     println "Invalid command"
     jmp _loop
-
-; Returns a pointer to the beginning of a struct
-; by index.
-; @parm eax - index
-; @returns eax - ptr to db entry
-get_entry:
-    imul eax, db_entry_size
-    add eax, employees
-    ret
 
 section ".bss" writable
     command_buffer      rb command_bufsize
@@ -152,10 +210,14 @@ section ".rodata"
         "help - prints this message",0xa, \
         "exit - exits the program",0xa, \
         "adde - add database entry",0xa, \
-        "list - list all registered employees",0xa
+        "list - list all registered employees",0xa, \
+        "save - save list to database.db",0xa, \
+        "load - read list from database.db",0xa
     help_string_len = $ - help_string
 
     help_name db "help",0x0
     exit_name db "exit",0x0
     adde_name db "adde",0x0
     list_name db "list",0x0
+    save_name db "save",0x0
+    load_name db "load",0x0
