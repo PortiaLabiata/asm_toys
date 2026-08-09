@@ -3,15 +3,7 @@
 format ELF
 section ".text" executable
 
-; Declare all functions as public for ease
-; of debugging
 public _start
-public help_func
-public adde_func 
-public list_func
-public save_func
-public load_func
-public exit_func
 
 include "macros.inc"
 
